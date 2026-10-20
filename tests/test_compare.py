@@ -11,6 +11,8 @@ def sample_result(directory, run_id="run_a", error=0.1):
     return save_result(directory, posterior, resolve_run(run_id), {
         "log_evidence": -16170, "log_evidence_err": error,
         "log_noise_evidence": -16293.358364584721,
+        "sampling_seconds": 41394.719138, "ncores": 16,
+        "likelihood_evaluations": 217823576,
     })
 
 
@@ -48,6 +50,9 @@ def test_unverified_evidence_is_never_differenced(tmp_path):
     write_json(path, summary)
     rows = compare(run_ids=["run_c"], results_root=tmp_path / "results", output=tmp_path / "plots", make_plots=False)
     assert rows[0]["evidence_comparable"] is True
+    assert rows[0]["sampling_seconds"] == 41394.719138
+    assert rows[0]["ncores"] == 16
+    assert rows[0]["likelihood_evaluations"] == 217823576
     assert rows[1]["evidence_comparable"] is False
     assert "delta_log_evidence" not in rows[1]
 

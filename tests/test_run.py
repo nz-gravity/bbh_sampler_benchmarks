@@ -41,6 +41,10 @@ def test_every_planned_sampler_receives_identical_likelihood(tmp_path, monkeypat
             assert snapshot["config"]["seed"] == 42
             assert not (tmp_path / ".work" / run_id).exists()
             assert summary["likelihood_evaluations"] == 123
+            assert summary["sampling_seconds"] == 2.0
+            assert snapshot["sampling_seconds"] == 2.0
+            assert snapshot["ncores"] == 1
+            assert snapshot["invocation_seconds"] >= 0
             with pytest.raises(FileExistsError):
                 execute_run(run_id, results_root=tmp_path / "results")
     assert {row[0] for row in seen} == {"dynesty", "bilby_mcmc"}

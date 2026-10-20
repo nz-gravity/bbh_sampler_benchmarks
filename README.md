@@ -57,6 +57,8 @@ results/run_a/
 
 Posterior thinning uses a fixed random seed and samples without replacement. Runs with fewer than 1000 samples retain all of them. Log evidence and its uncertainty are taken from the **full inference**, before thinning. Full Bilby result files are not retained. The CSV and JSON files are included by `.gitignore` and ready to commit.
 
+**Runtime is retained for every existing run** in `summary.json`: `sampling_seconds` is the time reported by Bilby, alongside `ncores` and `likelihood_evaluations`. New runs also save `invocation_seconds`, the measured duration of the latest sampling call. Thinning preserves these values. Comparisons export sampling time and core counts to `summary.csv` and plot runtime; compare times with the different core counts in mind.
+
 ## Compare combinations
 
 ```bash
