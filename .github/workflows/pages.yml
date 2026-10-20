@@ -41,7 +41,7 @@ jobs:
       pages: read
     env:
       MPLBACKEND: Agg
-      MPLCONFIGDIR: ${{ runner.temp }}/matplotlib
+      MPLCONFIGDIR: /tmp/matplotlib
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
