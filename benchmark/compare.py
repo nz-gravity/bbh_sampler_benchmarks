@@ -76,22 +76,31 @@ def joint_diagnostics(reference, candidate):
     }, occupancies
 
 
-def corner_plot(posteriors, output):
+def corner_plot(posteriors, output, *, bounds=None):
     import corner
     import matplotlib.pyplot as plt
     from matplotlib.lines import Line2D
 
     truth = [settings()["injection"][name] for name in PARAMETERS]
     combined = np.vstack([*posteriors.values(), truth])
-    bounds = [(float(combined[:, i].min()), float(combined[:, i].max())) for i in range(len(PARAMETERS))]
+    if bounds is None:
+        bounds = [(float(combined[:, i].min()), float(combined[:, i].max())) for i in range(len(PARAMETERS))]
     options = dict(labels=PARAMETERS, range=bounds, bins=30, plot_datapoints=False,
                    plot_density=False, smooth=1, levels=(0.5, 0.9), quiet=True)
     fig, handles = None, []
+    marginal_limits = np.zeros(len(PARAMETERS))
     for index, (name, points) in enumerate(posteriors.items()):
         color = "black" if index == 0 else f"C{index - 1}"
         markers = {"truths": truth, "truth_color": "grey"} if index == 0 else {}
-        fig = corner.corner(points, fig=fig, color=color, **markers, **options)
+        # A fresh dict is needed: corner adds the curve colour to hist_kwargs.
+        fig = corner.corner(points, fig=fig, color=color, hist_kwargs={"density": True}, **markers, **options)
+        axes = np.asarray(fig.axes).reshape(len(PARAMETERS), len(PARAMETERS))
+        # With explicit ranges, corner resets these limits on every overlay.
+        # Keep the largest density limit so later curves cannot clip earlier ones.
+        marginal_limits = np.maximum(marginal_limits, [axis.get_ylim()[1] for axis in axes.diagonal()])
         handles.append(Line2D([], [], color=color, label=name))
+    for axis, upper in zip(axes.diagonal(), marginal_limits):
+        axis.set_ylim(0, upper)
     handles.append(Line2D([], [], color="grey", label="injection"))
     fig.legend(handles=handles, loc="upper right")
     fig.savefig(output, dpi=120)

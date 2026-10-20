@@ -1,8 +1,40 @@
 import numpy as np
+import pytest
 
 from benchmark.compare import compare, features, joint_diagnostics
 from benchmark.registry import read_json, resolve_run, write_json
 from benchmark.results import PARAMETERS, save_result
+
+
+@pytest.mark.parametrize("reverse", [False, True])
+def test_corner_marginals_have_unit_area_and_never_clip_earlier_curves(tmp_path, monkeypatch, reverse):
+    import matplotlib
+    matplotlib.use("Agg")
+    from matplotlib.figure import Figure
+    from benchmark import compare as plotting
+
+    # Different widths expose overlay clipping; different row counts expose
+    # raw-count histograms that visually underweight the smaller posterior.
+    monkeypatch.setattr(plotting, "PARAMETERS", PARAMETERS[:2])
+    rng = np.random.default_rng(6)
+    center = np.array([14.8, 0.63])
+    runs = [("narrow", rng.normal(center, [0.015, 0.03], size=(1000, 2))),
+            ("broad", rng.normal(center, [0.06, 0.12], size=(200, 2)))]
+    if reverse:
+        runs.reverse()
+    captured = []
+    monkeypatch.setattr(Figure, "savefig", lambda figure, *args, **kwargs: captured.append(figure))
+    plotting.corner_plot(dict(runs), tmp_path / "corner.png")
+    axes = np.array(captured[0].axes).reshape(2, 2)
+    for axis in axes.diagonal():
+        assert len(axis.patches) == 2
+        colours = [patch.get_edgecolor() for patch in axis.patches]
+        assert colours[0] != colours[1]
+        for patch in axis.patches:
+            vertices = patch.get_xy()
+            area = abs(np.trapezoid(vertices[:, 1], vertices[:, 0]))
+            assert area == pytest.approx(1.0)
+            assert np.max(vertices[:, 1]) < axis.get_ylim()[1]
 
 
 def sample_result(directory, run_id="run_a", error=0.1):

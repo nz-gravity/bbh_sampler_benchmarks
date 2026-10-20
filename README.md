@@ -67,6 +67,26 @@ uv run python -m benchmark.compare --reference run_a --run run_f --run run_h
 uv run pytest
 ```
 
-Repeat `--run` to choose any combination. Comparisons read only the compact files and save an overlaid eight-parameter `corner.png`, evidence/cost plot, and `summary.csv` under `plots/against_run_a/`. Selected combinations have separate subdirectories. These portable samples and summaries can also drive a future docs page.
+Repeat `--run` to choose any combination. Comparisons read only the compact files and save an overlaid eight-parameter `corner.png`, evidence/cost plot, and `summary.csv` under `plots/against_run_a/`. Selected combinations have separate subdirectories. These portable samples and summaries also drive the docs website.
 
 Evidence differences require matching data, priors and likelihood conventions. Joint-space support screens supplement the corner contours. Thinning can discard rare modes; the retained rows are not a convergence test.
+
+## Public docs website
+
+- Settings table for every registered run, including configurations without results.
+- One corner overlay per available candidate against **dynesty_4000** (`run_a`), with common axis ranges and unit-area marginal densities.
+- Exact changed settings, full-size plots, and downloadable samples, summaries and configurations.
+- Builds only from saved results; never starts inference. Invalid checksums or mismatched configurations/likelihoods stop the build.
+
+Build and preview locally:
+
+```bash
+uv run python -m benchmark.docs
+uv run python -m http.server 8000 --directory _site --bind 127.0.0.1
+```
+
+Open <http://127.0.0.1:8000>. The generated `_site/` directory is ignored; commit the `docs/` sources and builder along with the benchmark configurations, data, results and locked environment.
+
+To publish on GitHub, select **Settings → Pages → Build and deployment → Source: GitHub Actions**, then push to `main` or run the **Benchmark website** workflow manually. The workflow tests the project, rebuilds plots from the current saved samples, and deploys `_site/`. Pull requests build and test without deploying. Later result commits refresh the website automatically.
+
+Expected URL after the first successful deployment: <https://nz-gravity.github.io/bbh_sampler_benchmarks/>.
