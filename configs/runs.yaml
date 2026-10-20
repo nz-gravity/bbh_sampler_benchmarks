@@ -82,3 +82,26 @@ run_j:
       adapt_nu: 10, pt_rejection_sample: false, burn_in_nact: 10, thin_by_nact: 0.2, fixed_discard: 0,
       autocorr_c: 5, L1steps: 100, L2steps: 5, check_point_delta_t: 1800, min_tau: 1, proposal_cycle: gwA,
       stop_after_convergence: false, evidence_method: stepping_stone, initial_sample_method: prior, check_point_plot: true}
+
+run_k:
+  sampler: dynesty
+  status: planned
+  purpose: Cheap local rslice pilot
+  kwargs: {nlive: 100, sample: rslice, slices: 3, bound: multi, dlogz: 1.0, add_live: true, update_interval: 600,
+      walks: 100, facc: 0.2, check_point_delta_t: 60, check_point_plot: false}
+
+run_l:
+  sampler: dynesty
+  status: planned
+  purpose: Cheap local low-nact pilot
+  kwargs: {nlive: 100, sample: act-walk, nact: 1, bound: live, dlogz: 1.0, add_live: true, update_interval: 600,
+      walks: 100, facc: 0.2, maxmcmc: 5000, naccept: 60, proposals: [diff, volumetric], check_point_delta_t: 60,
+      check_point_plot: false}
+
+run_m:
+  sampler: dynesty
+  status: planned
+  purpose: Cheap local short-walk pilot
+  kwargs: {nlive: 100, sample: rwalk, nact: 2, bound: live, dlogz: 1.0, add_live: true, update_interval: 600,
+      walks: 20, facc: 0.2, maxmcmc: 500, naccept: 60, proposals: [diff, volumetric], check_point_delta_t: 60,
+      check_point_plot: false}

@@ -1,0 +1,34 @@
+{
+  "config": {
+    "run_id": "run_k",
+    "sampler": "dynesty",
+    "status": "planned",
+    "purpose": "Cheap local rslice pilot",
+    "kwargs": {
+      "nlive": 100,
+      "sample": "rslice",
+      "slices": 3,
+      "bound": "multi",
+      "dlogz": 1.0,
+      "add_live": true,
+      "update_interval": 600,
+      "walks": 100,
+      "facc": 0.2,
+      "check_point_delta_t": 60,
+      "check_point_plot": false
+    },
+    "seed": 42
+  },
+  "likelihood_id": "70539a67b265d6827500821d191a7aa866db78f73b58efb287691371ebf96ee0",
+  "evidence_convention": "full_log_likelihood",
+  "log_evidence": -16173.69844474702,
+  "log_evidence_err": 0.6356424831826538,
+  "log_noise_evidence": -16293.358364584721,
+  "sampling_seconds": 19.521214,
+  "likelihood_evaluations": 24546,
+  "ncores": 2,
+  "invocation_seconds": 21.598419000016293,
+  "posterior_rows": 104,
+  "original_posterior_rows": 104,
+  "posterior_sha256": "617996d3455c6c8f4bc06da66a58ba9119aed4f284713dc8a76c117fc5ef2284"
+}

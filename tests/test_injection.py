@@ -58,7 +58,7 @@ def test_deterministic_generation_and_no_overwrite(tmp_path, shared_likelihood):
         build_likelihood(path)
 
 
-@pytest.mark.parametrize("run_id", ["run_a", "run_f", "run_g", "run_h", "run_i"])
+@pytest.mark.parametrize("run_id", [path.parent.name for path in sorted((ROOT / "results").glob("run_*/summary.json"))])
 def test_compact_posterior_uses_exact_same_likelihood_and_priors(run_id, shared_likelihood):
     summary, posterior = load_result(ROOT / "results" / run_id)
     likelihood, priors = shared_likelihood

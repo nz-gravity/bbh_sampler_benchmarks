@@ -9,7 +9,7 @@ import time
 
 import pytest
 
-from benchmark.registry import ROOT
+from benchmark.registry import ROOT, load_registry
 
 
 @pytest.fixture
@@ -34,8 +34,10 @@ def invoke(repo, *args, env=None):
 def test_default_preview_and_explicit_mcmc(cluster_checkout):
     result = invoke(cluster_checkout)
     assert result.returncode == 0, result.stderr
-    assert len(result.stdout.splitlines()) == 4
-    for name in ("run_b", "run_c", "run_d", "run_e"):
+    planned = [name for name, run in load_registry().items()
+               if run["status"] == "planned" and run["sampler"] == "dynesty"]
+    assert len(result.stdout.splitlines()) == len(planned)
+    for name in planned:
         assert f"bbh-{name}" in result.stdout
     assert "run_j" not in result.stdout
     assert "--account=oz200" in result.stdout

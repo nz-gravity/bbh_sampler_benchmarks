@@ -87,7 +87,7 @@ def test_imported_runs_cannot_be_executed(tmp_path):
         execute_run("run_a", results_root=tmp_path / "results")
 
 
-@pytest.mark.parametrize("run_id", ["run_b", "run_c", "run_d", "run_e", "run_j"])
+@pytest.mark.parametrize("run_id", [key for key, run in load_registry().items() if run["status"] == "planned"])
 def test_registered_options_and_dynesty_rng_are_accepted_without_sampling(run_id, tmp_path):
     from bilby.core.sampler.dynesty import Dynesty
     from bilby.bilby_mcmc.sampler import Bilby_MCMC

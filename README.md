@@ -30,6 +30,9 @@ All sampler settings are in [configs/runs.yaml](configs/runs.yaml). Refresh this
 | run_h | dynesty | 1000 | rslice, bound=live, slices=3 | dlogz=0.1 | imported |
 | run_i | dynesty | 100 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | imported |
 | run_j | bilby_mcmc | — | 8 temperatures, gwA | nsamples=2000 | planned |
+| run_k | dynesty | 100 | rslice, bound=multi, slices=3 | dlogz=1.0 | planned |
+| run_l | dynesty | 100 | act-walk, bound=live, nact=1, walks=100 | dlogz=1.0 | planned |
+| run_m | dynesty | 100 | rwalk, bound=live, nact=2, walks=20 | dlogz=1.0 | planned |
 <!-- RUNS:END -->
 
 New runs use sampling seed **42** automatically. To repeat a configuration, copy it to a new run ID and set `status: planned`. Completed runs are never overwritten.
@@ -45,13 +48,25 @@ uv run python -m benchmark.run --run run_b
 
 Use `--npool 4` for four workers, or `sbatch run.slurm run_b` on a cluster. Resume an interrupted run with `--run run_b --resume`. Checkpoints stay in ignored `.work/` directories until completion, then are removed. After a hard kill, remove `.running.lock` only after confirming the job has stopped.
 
+For cheaper local pilots, `run_k` uses `rslice, slices=3`; `run_l` uses `act-walk, nact=1`; `run_m` uses `rwalk, nact=2, walks=20, maxmcmc=500`. All three use 100 live points, `dlogz=1.0`, sampling seed 42 and the same saved data and priors:
+
+```bash
+uv run python -m benchmark.run --run run_k --npool 2
+uv run python -m benchmark.run --run run_l --npool 2
+uv run python -m benchmark.run --run run_m --npool 2
+```
+
+These aggressive settings test speed and posterior coverage. Compare the joint posteriors and evidence with `run_a` before drawing accuracy conclusions. They checkpoint every minute with checkpoint plots disabled.
+
+In `act-walk`, `nact` controls thinning of a cached chain spanning about 50 autocorrelation times; a low value can still take a long time. In `rwalk`, it controls the estimated walk length directly. See the [Bilby guide](https://bilby-dev.github.io/bilby/dynesty-guide.html).
+
 ## OzSTAR jobs
 
 Run these commands manually from the repository checkout on the login node, with `uv` available:
 
 ```bash
 bash ozstar/setup_env.sh         # Install the locked environment and check the saved dataset
-bash ozstar/submit.sh            # Preview the new Dynesty jobs: run_b, run_c, run_d, run_e
+bash ozstar/submit.sh            # Preview unfinished planned Dynesty jobs
 bash ozstar/submit.sh --submit   # Submit those jobs
 ```
 
