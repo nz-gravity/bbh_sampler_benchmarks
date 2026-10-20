@@ -1,7 +1,7 @@
 injection_id,run_id,status,log_evidence,log_evidence_err,sampling_seconds,invocation_seconds,likelihood_evaluations,ncores,posterior_rows
 0,run_m,completed,-16169.848902804337,0.6943318439712143,218.008574,44.46991070799413,307539,2,104
-1,run_m,pending,,,,,,,
-2,run_m,pending,,,,,,,
+1,run_m,completed,-15940.653617920772,0.6442866016663408,142.585385,144.5415527499863,225685,2,84
+2,run_m,running,,,,,,,
 3,run_m,pending,,,,,,,
 4,run_m,pending,,,,,,,
 5,run_m,pending,,,,,,,

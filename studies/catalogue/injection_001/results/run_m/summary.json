@@ -1,0 +1,40 @@
+{
+  "config": {
+    "run_id": "run_m",
+    "sampler": "dynesty",
+    "status": "planned",
+    "purpose": "Cheap local short-walk pilot",
+    "kwargs": {
+      "nlive": 100,
+      "sample": "rwalk",
+      "nact": 2,
+      "bound": "live",
+      "dlogz": 1.0,
+      "add_live": true,
+      "update_interval": 600,
+      "walks": 20,
+      "facc": 0.2,
+      "maxmcmc": 500,
+      "naccept": 60,
+      "proposals": [
+        "diff",
+        "volumetric"
+      ],
+      "check_point_delta_t": 60,
+      "check_point_plot": false
+    },
+    "seed": 42
+  },
+  "likelihood_id": "91677e519ce0b10c70e5f14b4614fef69eaed43197d80bb7a5d5bcfd757f1b4f",
+  "evidence_convention": "full_log_likelihood",
+  "log_evidence": -15940.653617920772,
+  "log_evidence_err": 0.6442866016663408,
+  "log_noise_evidence": -15976.153494180186,
+  "sampling_seconds": 142.585385,
+  "likelihood_evaluations": 225685,
+  "ncores": 2,
+  "invocation_seconds": 144.5415527499863,
+  "posterior_rows": 84,
+  "original_posterior_rows": 84,
+  "posterior_sha256": "32430f6f0ae670d53374415fb17d6b3d550a3a60b591fa35627e6e75476020b0"
+}
