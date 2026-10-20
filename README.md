@@ -65,6 +65,8 @@ BBH_TIME=48:00:00 bash ozstar/submit.sh --submit run_j         # Optional fresh 
 
 The existing MCMC result (`run_f`) is reused; `run_j` is excluded from default submissions. Completed runs are skipped. Batch jobs use the prepared environment without installing packages and load the committed strain/PSD arrays. They request a checkpoint three minutes before the time limit and clear only their own stopped-process lock. An interrupted job is resumed manually with the same CPU allocation. Logs are `slurm-<job-name>-<job-id>.out` and `.err` in the checkout. Only the compact posterior and runtime/evidence summary remain under `results/` on success.
 
+If a job fails before writing a checkpoint, it cannot use `--resume`. After confirming the job has stopped, move its `.work/<run_id>` directory aside and submit that run again. Environment setup checks a constrained prior draw before submission.
+
 ## Small results for Git
 
 Each completed run keeps only:

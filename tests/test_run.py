@@ -87,7 +87,7 @@ def test_imported_runs_cannot_be_executed(tmp_path):
         execute_run("run_a", results_root=tmp_path / "results")
 
 
-@pytest.mark.parametrize("run_id", ["run_b", "run_e", "run_j"])
+@pytest.mark.parametrize("run_id", ["run_b", "run_c", "run_d", "run_e", "run_j"])
 def test_registered_options_and_dynesty_rng_are_accepted_without_sampling(run_id, tmp_path):
     from bilby.core.sampler.dynesty import Dynesty
     from bilby.bilby_mcmc.sampler import Bilby_MCMC
@@ -98,7 +98,9 @@ def test_registered_options_and_dynesty_rng_are_accepted_without_sampling(run_id
     dynesty = config["sampler"] == "dynesty"
     sampler_class = Dynesty if dynesty else Bilby_MCMC
     seed = {"seed": config["seed"]} if dynesty else {}
+    # Real initialization verifies constrained prior draws and times likelihood
+    # evaluations. soft_init=True skips exactly the path used at job startup.
     sampler = sampler_class(likelihood, priors, outdir=str(tmp_path), label="preflight",
-                            soft_init=True, **seed, **config["kwargs"])
+                            **seed, **config["kwargs"])
     if dynesty:
         assert sampler.kwargs["rstate"].bit_generator.state == np.random.default_rng(42).bit_generator.state

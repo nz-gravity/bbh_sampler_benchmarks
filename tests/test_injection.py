@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import numpy as np
 import pytest
 
@@ -71,3 +73,27 @@ def test_compact_posterior_uses_exact_same_likelihood_and_priors(run_id, shared_
 
 def test_prior_file_is_unchanged():
     assert sha256(ROOT / settings()["prior_file"]) == "4c8d3dd0b4b7535498529269e15596412a74ade8b346a30ec5d8a61de018c121"
+
+
+@pytest.mark.parametrize("size,shape", [(None, (8, 1)), (1, (8, 1)), (2, (8, 2))])
+def test_constrained_draws_keep_shapes_and_constraints(shared_likelihood, size, shape):
+    # Bilby copies the priors before sampler initialization; keep compatibility
+    # through that copy as well as through the likelihood's original priors.
+    priors = shared_likelihood[1].copy()
+    keys = priors.non_fixed_keys
+    samples = priors.sample_subset_constrained_as_array(keys, size=size)
+    assert samples.shape == shape
+    assert np.all(priors.evaluate_constraints(dict(zip(keys, samples))))
+
+
+def test_single_draw_still_rejects_invalid_constraints(shared_likelihood, monkeypatch):
+    priors = deepcopy(shared_likelihood[1])
+    priors["mass_1"].maximum = 40
+    # Test a stricter constraint on a copy only: reject a high primary mass,
+    # then accept an equal-mass draw. The experiment's priors are unchanged.
+    draws = iter([{"chirp_mass": 20.0, "mass_ratio": 0.125},
+                  {"chirp_mass": 14.0, "mass_ratio": 1.0}])
+    monkeypatch.setattr(priors, "sample_subset", lambda **kwargs: next(draws))
+    samples = priors.sample_subset_constrained(["chirp_mass", "mass_ratio"], size=1)
+    np.testing.assert_array_equal(samples["chirp_mass"], [14.0])
+    np.testing.assert_array_equal(samples["mass_ratio"], [1.0])
