@@ -15,7 +15,7 @@ from benchmark.registry import ROOT, load_registry
 @pytest.fixture
 def cluster_checkout(tmp_path):
     repo = tmp_path / "cluster checkout"
-    for name in ("ozstar/submit.sh", "ozstar/catalogue.slurm", "run.slurm", "configs/runs.yaml", "benchmark/__init__.py", "benchmark/registry.py"):
+    for name in ("ozstar/submit.sh", "run.slurm", "configs/runs.yaml", "benchmark/__init__.py", "benchmark/registry.py"):
         target = repo / name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / name, target)
@@ -86,15 +86,12 @@ def test_completed_jobs_are_skipped_and_resume_is_explicit(cluster_checkout):
 
 
 @pytest.mark.parametrize("foreign_lock", [False, True])
-@pytest.mark.parametrize("job_script", ["run.slurm", "ozstar/catalogue.slurm"])
-def test_job_forwards_checkpoint_signal_and_only_clears_its_own_lock(cluster_checkout, foreign_lock, job_script):
-    relative_work = "studies/catalogue/injection_007/.work/run_b" if "catalogue" in job_script else ".work/run_b"
-    work = cluster_checkout / relative_work
+def test_job_forwards_checkpoint_signal_and_only_clears_its_own_lock(cluster_checkout, foreign_lock):
     python = cluster_checkout / ".venv/bin/python"
     python.write_text(f'''#!{sys.executable}
 import os,signal,time
 from pathlib import Path
-work=Path({relative_work!r})
+work=Path(".work/run_b")
 work.mkdir(parents=True)
 job="different-job" if {foreign_lock!r} else os.environ["SLURM_JOB_ID"]
 (work/".running.lock").write_text(f"pid={{os.getpid()}}\\njob={{job}}\\n")
@@ -107,8 +104,8 @@ while True:time.sleep(0.01)
 ''')
     python.chmod(0o755)
     env = {**os.environ, "SLURM_SUBMIT_DIR": str(cluster_checkout), "SLURM_JOB_ID": "12345",
-           "SLURM_CPUS_PER_TASK": "4", "SLURM_ARRAY_TASK_ID": "7", "JOBFS": str(cluster_checkout / "scratch")}
-    process = subprocess.Popen(["bash", str(cluster_checkout / job_script), "run_b"],
+           "SLURM_CPUS_PER_TASK": "4", "JOBFS": str(cluster_checkout / "scratch")}
+    process = subprocess.Popen(["bash", str(cluster_checkout / "run.slurm"), "run_b"],
                                env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     try:
         deadline = time.monotonic() + 5
@@ -118,8 +115,8 @@ while True:time.sleep(0.01)
         process.send_signal(signal.SIGUSR1)
         stdout, stderr = process.communicate(timeout=5)
         assert process.returncode != 0
-        assert (work / "run_b_resume.pickle").read_bytes() == b"checkpoint written"
-        assert (work / ".running.lock").exists() == foreign_lock
+        assert (cluster_checkout / ".work/run_b/run_b_resume.pickle").read_bytes() == b"checkpoint written"
+        assert (cluster_checkout / ".work/run_b/.running.lock").exists() == foreign_lock
     finally:
         if process.poll() is None:
             process.kill()

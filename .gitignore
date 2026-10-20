@@ -19,6 +19,3 @@ plots/*
 *.log
 slurm-*.out
 slurm-*.err
-studies/*/injection_*/.work/
-studies/*/logs/
-studies/*/.batch_*.lock

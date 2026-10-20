@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 import time
 
-from .injection import DATA, build_likelihood, data_manifest, settings
+from .injection import build_likelihood, data_manifest, settings
 from .registry import ROOT, load_registry, read_json, resolve_run, run_table, update_readme, write_json
 from .results import save_result
 
@@ -28,8 +28,7 @@ def result_metrics(result):
     }
 
 
-def execute_run(run_id, *, resume=False, npool=1, results_root=None, registry=None,
-                data_path=DATA, injection_config=None):
+def execute_run(run_id, *, resume=False, npool=1, results_root=None, registry=None):
     """Sample in temporary working output, then keep only a compact completed result."""
     import bilby
     import numpy as np
@@ -45,8 +44,7 @@ def execute_run(run_id, *, resume=False, npool=1, results_root=None, registry=No
     if directory.exists():
         raise FileExistsError(f"{run_id} already has output; create a new run ID")
     work = results_root.parent / ".work" / run_id
-    manifest = data_manifest(data_path, config=injection_config)
-    config = {"run": resolved, "likelihood_id": manifest["likelihood_id"], "npool": npool}
+    config = {"run": resolved, "likelihood_id": data_manifest()["likelihood_id"], "npool": npool}
     snapshot = work / "config.json"
     if snapshot.exists():
         if read_json(snapshot) != config:
@@ -68,7 +66,7 @@ def execute_run(run_id, *, resume=False, npool=1, results_root=None, registry=No
     try:
         if not snapshot.exists():
             write_json(snapshot, config)
-        likelihood, priors = build_likelihood(data_path, config=injection_config)
+        likelihood, priors = build_likelihood()
         bilby.core.utils.random.seed(resolved["seed"])
         np.random.seed(resolved["seed"])
         sampler_seed = {"seed": resolved["seed"]} if resolved["sampler"] == "dynesty" else {}
@@ -76,13 +74,11 @@ def execute_run(run_id, *, resume=False, npool=1, results_root=None, registry=No
         result = bilby.run_sampler(
             likelihood=likelihood, priors=priors, sampler=resolved["sampler"],
             outdir=str(work), label=run_id, npool=npool, save=False,
-            resume=resume, use_ratio=True,
-            injection_parameters=(settings() if injection_config is None else injection_config)["injection"],
+            resume=resume, use_ratio=True, injection_parameters=settings()["injection"],
             **sampler_seed, **resolved["kwargs"],
         )
         metrics = {**result_metrics(result), "invocation_seconds": time.perf_counter() - start}
-        summary = save_result(directory, result.posterior, resolved, metrics,
-                              likelihood_id=manifest["likelihood_id"])
+        summary = save_result(directory, result.posterior, resolved, metrics)
     finally:
         lock.unlink()
     shutil.rmtree(work)
