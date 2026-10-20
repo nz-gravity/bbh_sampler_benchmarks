@@ -1,0 +1,23 @@
+[project]
+name = "bbh-benchmarks"
+version = "0.1.0"
+description = "One fixed BBH injection, shared likelihood, and reproducible sampler comparisons"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+  "bilby==2.8.0",
+  "dynesty==3.1.0",
+  "lalsuite==7.26.15",
+  "numpy==2.4.4",
+  "scipy==1.18.1",
+  "pandas==3.0.3",
+  "matplotlib==3.10.9",
+  "corner==2.2.3",
+  "PyYAML==6.0.3",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

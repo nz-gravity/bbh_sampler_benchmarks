@@ -1,0 +1,43 @@
+{
+  "config": {
+    "run_id": "run_f",
+    "sampler": "bilby_mcmc",
+    "seed": null,
+    "status": "imported",
+    "purpose": "Existing sampler result",
+    "kwargs": {
+      "nsamples": 2000,
+      "nensemble": 1,
+      "pt_ensemble": false,
+      "ntemps": 8,
+      "Tmax_from_SNR": 20,
+      "adapt": true,
+      "adapt_t0": 100,
+      "adapt_nu": 10,
+      "pt_rejection_sample": false,
+      "burn_in_nact": 10,
+      "thin_by_nact": 0.2,
+      "fixed_discard": 0,
+      "autocorr_c": 5,
+      "L1steps": 100,
+      "L2steps": 5,
+      "check_point_delta_t": 1800,
+      "min_tau": 1,
+      "proposal_cycle": "gwA",
+      "stop_after_convergence": false,
+      "evidence_method": "stepping_stone",
+      "initial_sample_method": "prior"
+    }
+  },
+  "likelihood_id": "70539a67b265d6827500821d191a7aa866db78f73b58efb287691371ebf96ee0",
+  "evidence_convention": "full_log_likelihood",
+  "log_evidence": -16169.083769667357,
+  "log_evidence_err": 0.13697850404577075,
+  "log_noise_evidence": -16293.358364584721,
+  "sampling_seconds": 58095.626956,
+  "likelihood_evaluations": 52996800,
+  "ncores": 4,
+  "posterior_rows": 1000,
+  "original_posterior_rows": 2020,
+  "posterior_sha256": "6689744fa361d2eb3a24879bc94d0c7ab1277ed4868d91fa12bb093b729a923c"
+}

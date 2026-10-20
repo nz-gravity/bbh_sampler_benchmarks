@@ -1,0 +1,89 @@
+# Add a new ID when changing settings or repeating a completed run.
+# null seeds were not recorded for existing results. New runs require an integer seed.
+
+run_a:
+  sampler: dynesty
+  seed: null
+  status: imported
+  purpose: Fiducial
+  kwargs: {nlive: 4000, bound: live, sample: rwalk, update_interval: 600, walks: 100, facc: 0.2, dlogz: 0.1,
+      add_live: true, nact: 20, maxmcmc: 5000, naccept: 10}
+
+run_b:
+  sampler: dynesty
+  seed: 42
+  status: planned
+  purpose: Cheap
+  kwargs: {nlive: 1000, sample: act-walk, nact: 2, bound: live, dlogz: 0.5, add_live: true, update_interval: 600,
+      walks: 100, facc: 0.2, maxmcmc: 5000, naccept: 60, proposals: [diff, volumetric], check_point_delta_t: 1800,
+      check_point_plot: true}
+
+run_c:
+  sampler: dynesty
+  seed: 42
+  status: planned
+  purpose: Cheap
+  kwargs: {nlive: 500, sample: act-walk, nact: 2, bound: live, dlogz: 0.5, add_live: true, update_interval: 600,
+      walks: 100, facc: 0.2, maxmcmc: 5000, naccept: 60, proposals: [diff, volumetric], check_point_delta_t: 1800,
+      check_point_plot: true}
+
+run_d:
+  sampler: dynesty
+  seed: 42
+  status: planned
+  purpose: Aggressive
+  kwargs: {nlive: 250, sample: act-walk, nact: 2, bound: live, dlogz: 0.5, add_live: true, update_interval: 600,
+      walks: 100, facc: 0.2, maxmcmc: 5000, naccept: 60, proposals: [diff, volumetric], check_point_delta_t: 1800,
+      check_point_plot: true}
+
+run_e:
+  sampler: dynesty
+  seed: 42
+  status: planned
+  purpose: Alternative exploration
+  kwargs: {nlive: 500, sample: rslice, slices: 3, bound: multi, dlogz: 0.5, add_live: true, update_interval: 600,
+      walks: 100, facc: 0.2, check_point_delta_t: 1800, check_point_plot: true}
+
+run_f:
+  sampler: bilby_mcmc
+  seed: null
+  status: imported
+  purpose: Existing sampler result
+  kwargs: {nsamples: 2000, nensemble: 1, pt_ensemble: false, ntemps: 8, Tmax_from_SNR: 20, adapt: true, adapt_t0: 100,
+      adapt_nu: 10, pt_rejection_sample: false, burn_in_nact: 10, thin_by_nact: 0.2, fixed_discard: 0,
+      autocorr_c: 5, L1steps: 100, L2steps: 5, check_point_delta_t: 1800, min_tau: 1, proposal_cycle: gwA,
+      stop_after_convergence: false, evidence_method: stepping_stone, initial_sample_method: prior}
+
+run_g:
+  sampler: dynesty
+  seed: null
+  status: imported
+  purpose: Existing sampler result
+  kwargs: {nlive: 2000, bound: live, sample: rwalk, update_interval: 600, walks: 100, facc: 0.2, dlogz: 0.1,
+      add_live: true, nact: 20, maxmcmc: 5000, naccept: 10}
+
+run_h:
+  sampler: dynesty
+  seed: null
+  status: imported
+  purpose: Existing sampler result
+  kwargs: {nlive: 1000, bound: live, sample: rslice, update_interval: 600, walks: 100, facc: 0.2, slices: 3,
+      dlogz: 0.1, add_live: true}
+
+run_i:
+  sampler: dynesty
+  seed: null
+  status: imported
+  purpose: Existing sampler result
+  kwargs: {nlive: 100, bound: live, sample: rwalk, update_interval: 600, walks: 100, facc: 0.2, dlogz: 0.1,
+      add_live: true, nact: 20, maxmcmc: 5000, naccept: 10}
+
+run_j:
+  sampler: bilby_mcmc
+  seed: 42
+  status: planned
+  purpose: Reproducible MCMC baseline
+  kwargs: {nsamples: 2000, nensemble: 1, pt_ensemble: false, ntemps: 8, Tmax_from_SNR: 20, adapt: true, adapt_t0: 100,
+      adapt_nu: 10, pt_rejection_sample: false, burn_in_nact: 10, thin_by_nact: 0.2, fixed_discard: 0,
+      autocorr_c: 5, L1steps: 100, L2steps: 5, check_point_delta_t: 1800, min_tau: 1, proposal_cycle: gwA,
+      stop_after_convergence: false, evidence_method: stepping_stone, initial_sample_method: prior, check_point_plot: true}

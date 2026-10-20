@@ -1,0 +1,33 @@
+{
+  "config": {
+    "run_id": "run_i",
+    "sampler": "dynesty",
+    "seed": null,
+    "status": "imported",
+    "purpose": "Existing sampler result",
+    "kwargs": {
+      "nlive": 100,
+      "bound": "live",
+      "sample": "rwalk",
+      "update_interval": 600,
+      "walks": 100,
+      "facc": 0.2,
+      "dlogz": 0.1,
+      "add_live": true,
+      "nact": 20,
+      "maxmcmc": 5000,
+      "naccept": 10
+    }
+  },
+  "likelihood_id": "70539a67b265d6827500821d191a7aa866db78f73b58efb287691371ebf96ee0",
+  "evidence_convention": "full_log_likelihood",
+  "log_evidence": -16169.780715128327,
+  "log_evidence_err": 0.40258555371574906,
+  "log_noise_evidence": -16293.358364584721,
+  "sampling_seconds": 2586.911168,
+  "likelihood_evaluations": 4903776,
+  "ncores": 8,
+  "posterior_rows": 492,
+  "original_posterior_rows": 492,
+  "posterior_sha256": "391a4e2f1c9033513288b6b574329863f9b5f9e90648515c656cb4652bca8e94"
+}
