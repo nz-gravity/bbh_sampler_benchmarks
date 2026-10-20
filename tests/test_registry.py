@@ -17,6 +17,7 @@ def test_registry_and_generated_readme_agree():
     assert registry["run_a"]["kwargs"]["nlive"] == 4000
     assert registry["run_a"]["kwargs"]["nact"] == 20
     assert run_table(registry) in (ROOT / "README.md").read_text()
+    assert "| Seed |" not in run_table(registry)
     assert all(run["seed"] == 42 for run in registry.values() if run["status"] == "planned")
 
 
@@ -27,9 +28,18 @@ def test_completed_configurations_match_registry():
         assert summary["config"] == resolve_run(path.parent.name, registry)
 
 
+def test_new_runs_default_to_seed_42_and_imported_metadata_is_unchanged(tmp_path):
+    registry = deepcopy(load_registry())
+    registry["run_b"].pop("seed")
+    loaded = load_registry(write_registry(tmp_path, registry))
+    assert loaded["run_b"]["seed"] == 42
+    assert loaded["run_a"]["seed"] is None
+
+
 @pytest.mark.parametrize("change", [
     lambda d: d["run_b"].update(seed=None),
     lambda d: d["run_b"].update(seed=-1),
+    lambda d: d["run_b"].update(seed=43),
     lambda d: d["run_a"]["kwargs"].update(nlive=500),
     lambda d: d["run_b"]["kwargs"].update(nlive=0),
     lambda d: d["run_b"]["kwargs"].update(outdir="elsewhere"),

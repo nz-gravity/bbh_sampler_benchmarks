@@ -1,5 +1,5 @@
 # Add a new ID when changing settings or repeating a completed run.
-# null seeds were not recorded for existing results. New runs require an integer seed.
+# New runs use sampling seed 42 automatically. null marks unrecorded imported seeds.
 
 run_a:
   sampler: dynesty
@@ -11,7 +11,6 @@ run_a:
 
 run_b:
   sampler: dynesty
-  seed: 42
   status: planned
   purpose: Cheap
   kwargs: {nlive: 1000, sample: act-walk, nact: 2, bound: live, dlogz: 0.5, add_live: true, update_interval: 600,
@@ -20,7 +19,6 @@ run_b:
 
 run_c:
   sampler: dynesty
-  seed: 42
   status: planned
   purpose: Cheap
   kwargs: {nlive: 500, sample: act-walk, nact: 2, bound: live, dlogz: 0.5, add_live: true, update_interval: 600,
@@ -29,7 +27,6 @@ run_c:
 
 run_d:
   sampler: dynesty
-  seed: 42
   status: planned
   purpose: Aggressive
   kwargs: {nlive: 250, sample: act-walk, nact: 2, bound: live, dlogz: 0.5, add_live: true, update_interval: 600,
@@ -38,7 +35,6 @@ run_d:
 
 run_e:
   sampler: dynesty
-  seed: 42
   status: planned
   purpose: Alternative exploration
   kwargs: {nlive: 500, sample: rslice, slices: 3, bound: multi, dlogz: 0.5, add_live: true, update_interval: 600,
@@ -80,7 +76,6 @@ run_i:
 
 run_j:
   sampler: bilby_mcmc
-  seed: 42
   status: planned
   purpose: Reproducible MCMC baseline
   kwargs: {nsamples: 2000, nensemble: 1, pt_ensemble: false, ntemps: 8, Tmax_from_SNR: 20, adapt: true, adapt_t0: 100,

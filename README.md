@@ -18,21 +18,21 @@ The dataset and prior file are committed. `uv.lock` pins the environment. Tests 
 All sampler settings are in [configs/runs.yaml](configs/runs.yaml). Refresh this table with `uv run python -m benchmark.run --update-readme`.
 
 <!-- RUNS:START -->
-| Run | Sampler | nlive | Exploration | Stopping | Seed | Status |
-|---|---|---:|---|---|---|---|
-| run_a | dynesty | 4000 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | unknown | imported |
-| run_b | dynesty | 1000 | act-walk, bound=live, nact=2, walks=100 | dlogz=0.5 | 42 | planned |
-| run_c | dynesty | 500 | act-walk, bound=live, nact=2, walks=100 | dlogz=0.5 | 42 | planned |
-| run_d | dynesty | 250 | act-walk, bound=live, nact=2, walks=100 | dlogz=0.5 | 42 | planned |
-| run_e | dynesty | 500 | rslice, bound=multi, slices=3 | dlogz=0.5 | 42 | planned |
-| run_f | bilby_mcmc | — | 8 temperatures, gwA | nsamples=2000 | unknown | imported |
-| run_g | dynesty | 2000 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | unknown | imported |
-| run_h | dynesty | 1000 | rslice, bound=live, slices=3 | dlogz=0.1 | unknown | imported |
-| run_i | dynesty | 100 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | unknown | imported |
-| run_j | bilby_mcmc | — | 8 temperatures, gwA | nsamples=2000 | 42 | planned |
+| Run | Sampler | nlive | Exploration | Stopping | Status |
+|---|---|---:|---|---|---|
+| run_a | dynesty | 4000 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | imported |
+| run_b | dynesty | 1000 | act-walk, bound=live, nact=2, walks=100 | dlogz=0.5 | planned |
+| run_c | dynesty | 500 | act-walk, bound=live, nact=2, walks=100 | dlogz=0.5 | planned |
+| run_d | dynesty | 250 | act-walk, bound=live, nact=2, walks=100 | dlogz=0.5 | planned |
+| run_e | dynesty | 500 | rslice, bound=multi, slices=3 | dlogz=0.5 | planned |
+| run_f | bilby_mcmc | — | 8 temperatures, gwA | nsamples=2000 | imported |
+| run_g | dynesty | 2000 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | imported |
+| run_h | dynesty | 1000 | rslice, bound=live, slices=3 | dlogz=0.1 | imported |
+| run_i | dynesty | 100 | rwalk, bound=live, nact=20, walks=100 | dlogz=0.1 | imported |
+| run_j | bilby_mcmc | — | 8 temperatures, gwA | nsamples=2000 | planned |
 <!-- RUNS:END -->
 
-Existing results have unknown sampler seeds; these are explicitly `null`. To repeat a configuration, copy it to a new run ID, set `status: planned` and choose an integer seed. Completed runs are never overwritten.
+New runs use sampling seed **42** automatically. To repeat a configuration, copy it to a new run ID and set `status: planned`. Completed runs are never overwritten.
 
 ## Run
 

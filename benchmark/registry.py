@@ -8,6 +8,7 @@ import re
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+SAMPLING_SEED = 42
 
 
 def read_json(path):
@@ -61,11 +62,13 @@ def load_registry(path=None):
             raise ValueError(f"Unsupported sampler in {run_id}")
         if run.get("status") not in {"planned", "imported"}:
             raise ValueError(f"Missing planned/imported status in {run_id}")
-        seed = run.get("seed")
+        seed = run.setdefault("seed", SAMPLING_SEED if run["status"] == "planned" else None)
         if seed is None and run["status"] != "imported":
             raise ValueError(f"A new run needs a random seed: {run_id}")
         if seed is not None and (type(seed) is not int or seed < 0):
             raise ValueError(f"Invalid random seed: {run_id}")
+        if run["status"] == "planned" and seed != SAMPLING_SEED:
+            raise ValueError(f"New runs use sampling seed {SAMPLING_SEED}: {run_id}")
         kwargs = run.get("kwargs")
         if not isinstance(kwargs, dict):
             raise ValueError(f"Missing sampler kwargs: {run_id}")
@@ -90,8 +93,8 @@ def resolve_run(run_id, registry=None):
 
 def run_table(registry=None):
     registry = registry if registry is not None else load_registry()
-    lines = ["| Run | Sampler | nlive | Exploration | Stopping | Seed | Status |",
-             "|---|---|---:|---|---|---|---|"]
+    lines = ["| Run | Sampler | nlive | Exploration | Stopping | Status |",
+             "|---|---|---:|---|---|---|"]
     for name, run in registry.items():
         kw = run["kwargs"]
         if run["sampler"] == "dynesty":
@@ -103,8 +106,7 @@ def run_table(registry=None):
         else:
             settings = [f"{kw.get('ntemps', '?')} temperatures", str(kw.get("proposal_cycle", "unknown"))]
             stopping = f"nsamples={kw.get('nsamples', 'unknown')}"
-        seed = "unknown" if run["seed"] is None else str(run["seed"])
-        lines.append(f"| {name} | {run['sampler']} | {kw.get('nlive', '—')} | {', '.join(settings)} | {stopping} | {seed} | {run['status']} |")
+        lines.append(f"| {name} | {run['sampler']} | {kw.get('nlive', '—')} | {', '.join(settings)} | {stopping} | {run['status']} |")
     return "\n".join(lines)
 
 
