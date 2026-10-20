@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Single-BBH sampler benchmark: exact settings differences and posterior corner plots against Dynesty with 4000 live points.">
+  <meta name="description" content="BBH sampler settings, likelihood evaluations, runtimes and posterior corner plots against run a.">
   <meta name="color-scheme" content="light">
   <title>BBH sampler benchmark</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23192838'/%3E%3Ccircle cx='16' cy='20' r='8' fill='%23ffffff'/%3E%3Ccircle cx='25' cy='20' r='5' fill='%237eb8de'/%3E%3C/svg%3E">
@@ -19,43 +19,41 @@
   </div></header>
   <main id="main">
     <section class="intro">
-      <p class="eyebrow">Single injection · shared data &amp; priors</p>
-      <h1>Sampler settings<br><span>&amp; posterior comparisons.</span></h1>
-      <p class="lede">One binary black hole signal, different sampling choices.<br>
-        Compare every available posterior with <strong>dynesty_4000</strong>, our fixed reference.</p>
+      <p class="eyebrow">Fixed BBH injection</p>
+      <h1>Sampler benchmark</h1>
+      <p class="lede">Settings, cost and posteriors. Reference: <strong>run a</strong>.</p>
       <div class="study-strip"><span><b>$run_count</b> configurations</span><span><b>$available_count</b> saved posteriors</span>
-        <span><b>$parameter_count</b> sampled parameters</span><span class="reference-label"><i></i> Reference: run_a · 4000 live points</span></div>
+        <span><b>$parameter_count</b> sampled parameters</span></div>
       <details class="experiment"><summary>Shared experiment <span>$detectors · $waveform · $duration s</span></summary>
         <p>$sample_rate Hz sampling; $min_frequency–$max_frequency Hz analysis band. Intrinsic parameters sampled, extrinsics fixed;
-          no phase, time or distance marginalization. Every plotted run passes the saved posterior checksum and shared likelihood/configuration checks.</p>
+          no phase, time or distance marginalization.</p>
         <div class="download-links"><a href="downloads/bbh.yaml">Injection &amp; likelihood settings ↗</a><a href="downloads/bbh.prior">Priors ↗</a></div>
       </details>
     </section>
     <section id="settings" class="section">
-      <div class="section-heading"><div><p class="eyebrow">01 / Configurations</p><h2>What changes between runs?</h2></div>
+      <div class="section-heading"><div><p class="eyebrow">01 / Runs</p><h2>Settings &amp; cost</h2></div>
         <a class="text-link" href="downloads/runs.yaml">All settings YAML ↓</a></div>
-      <p class="section-note">Changed keys are relative to <code>dynesty_4000</code> (<code>run_a</code>). Select a completed run to see its overlay and exact values.</p>
+      <p class="section-note">Changes are relative to run a. Select a plot to compare posteriors.</p>
       <div class="table-scroll settings-table" tabindex="0" role="region" aria-label="All sampler configurations">
-        <table><thead><tr><th scope="col">Configuration</th><th scope="col">Live points</th><th scope="col">Exploration</th>
-          <th scope="col">Stopping</th><th scope="col">Changed settings</th><th scope="col">Posterior</th></tr></thead>
+        <table><thead><tr><th scope="col">Run</th><th scope="col">Sampler</th><th scope="col">Live points</th><th scope="col">Exploration</th>
+          <th scope="col">Stopping</th><th scope="col"># LnL evals</th><th scope="col">Runtime</th><th scope="col">Changes</th><th scope="col">Plot</th></tr></thead>
           <tbody>$rows</tbody></table>
       </div>
-      <p class="table-note">“No result yet” means the configuration is registered but no saved posterior is available.</p>
+      <p class="table-note">Runtime is wall time; core counts differ. — means not recorded.</p>
     </section>
     <section id="posteriors" class="section posterior-section">
-      <div class="section-heading"><div><p class="eyebrow">02 / Posteriors</p><h2>Corner plots against the reference.</h2></div>
+      <div class="section-heading"><div><p class="eyebrow">02 / Posteriors</p><h2>Corner plots</h2></div>
         <span class="count-label">$comparison_count comparisons</span></div>
-      <p class="section-note">Black is always <code>dynesty_4000</code>. Blue is the selected run. All plots use the same axis ranges.</p>
+      <p class="section-note">Black: run a. Blue: comparison run. Shared axis ranges.</p>
       <nav class="comparison-nav" aria-label="Choose a posterior comparison">$choices</nav>
       $panels
-      <aside class="reading-note"><b>Reading these plots</b><p>Each diagonal marginal is normalized to unit area. Contours enclose 50% and 90% of the smoothed two-dimensional sample density.
-        Grey lines mark the injected parameters. Plots use up to 1000 retained equal-weight samples per run;
-        thinning can hide rare modes. The reference is a sampled posterior, and visual agreement alone does not establish convergence.</p></aside>
-      <div class="reference-downloads">Reference files: <a href="downloads/run_a/posterior.csv" download>dynesty_4000 posterior ↓</a>
+      <aside class="reading-note"><b>Plot notes</b><p>Unit-area marginals; 50% and 90% contours. Up to 1000 retained samples per run.
+        Thinning can hide rare modes; visual agreement does not establish convergence.</p></aside>
+      <div class="reference-downloads">Reference files: <a href="downloads/run_a/posterior.csv" download>run a posterior ↓</a>
         <a href="downloads/run_a/summary.json" download>Reference summary ↓</a></div>
     </section>
   </main>
-  <footer><span>BBH sampler benchmark</span><span>Built from versioned settings &amp; saved posteriors.</span>
-    <a href="https://github.com/nz-gravity/bbh_sampler_benchmarks">Source &amp; reproduction ↗</a></footer>
+  <footer><span>BBH sampler benchmark</span>
+    <a href="https://github.com/nz-gravity/bbh_sampler_benchmarks">Source ↗</a></footer>
 </body>
 </html>

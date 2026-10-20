@@ -9,7 +9,7 @@ from string import Template
 
 import numpy as np
 
-from .compare import corner_plot, verified_identity
+from .compare import corner_plot, finite_number, verified_identity
 from .injection import settings
 from .registry import ROOT, load_registry
 from .results import PARAMETERS, load_result
@@ -21,10 +21,21 @@ def value_text(value):
     return "not recorded" if value is None else json.dumps(value, ensure_ascii=False)
 
 
-def run_label(run):
-    if run["sampler"] == "dynesty":
-        return f"dynesty_{run['kwargs']['nlive']}"
-    return "bilby_mcmc"
+def run_label(run_id):
+    return run_id.replace("_", " ")
+
+
+def count_text(value):
+    return f"{value:,.0f}" if finite_number(value) and value >= 0 else "—"
+
+
+def runtime_text(seconds):
+    if not finite_number(seconds) or seconds < 0:
+        return "—"
+    hours, remaining = divmod(round(seconds), 3600)
+    minutes, seconds = divmod(remaining, 60)
+    return (f"{hours}h {minutes:02d}m {seconds:02d}s" if hours
+            else f"{minutes}m {seconds:02d}s" if minutes else f"{seconds}s")
 
 
 def configuration(run):
@@ -65,7 +76,7 @@ def build(output=None, *, results_root=None):
             verified_identity(name, summary, registry)
             loaded[name] = (summary, posterior[list(PARAMETERS)].to_numpy())
     if REFERENCE not in loaded:
-        raise ValueError("Verified dynesty_4000 (run_a) results are required to build the site")
+        raise ValueError("Verified run_a results are required to build the site")
 
     output = Path(output or ROOT / "_site").resolve()
     # Write only generated files; do not clear a user-supplied destination.
@@ -94,13 +105,20 @@ def build(output=None, *, results_root=None):
         else:
             exploration = f"{kw.get('ntemps', '?')} temperatures · {kw.get('proposal_cycle', 'default')}"
             stopping = f"nsamples = {kw.get('nsamples', 'default')}"
-        status = ("Reference" if name == REFERENCE else "View plot ↗") if name in loaded else "No result yet"
+        status = ("Reference" if name == REFERENCE else "View plot ↗") if name in loaded else "Pending"
         status_html = (f'<a class="plot-link" href="#{name}">{status}</a>' if name in candidates
                        else f'<span class="badge {"reference" if name == REFERENCE else "pending"}">{status}</span>')
         change = changes_html(delta)
+        summary = loaded[name][0] if name in loaded else {}
+        evaluations = count_text(summary.get("likelihood_evaluations"))
+        runtime = runtime_text(summary.get("sampling_seconds"))
+        cores = summary.get("ncores")
+        if finite_number(cores) and cores > 0:
+            runtime += f'<small>{cores:g} cores</small>'
         table.append(f'<tr class="{"baseline" if name == REFERENCE else ""}"><th scope="row">'
-                     f'{code(run_label(run))}<small>{name}</small></th><td>{kw.get("nlive", "—")}</td>'
-                     f'<td>{escape(exploration)}</td><td>{code(stopping)}</td>'
+                     f'{escape(run_label(name))}</th><td>{code(run["sampler"])}</td><td>{kw.get("nlive", "—")}</td>'
+                     f'<td class="exploration">{escape(exploration)}</td><td class="stopping">{code(stopping)}</td>'
+                     f'<td class="metric">{evaluations}</td><td class="metric runtime">{runtime}</td>'
                      f'<td class="changes">{change}</td><td>{status_html}</td></tr>')
 
     for name in loaded:
@@ -111,32 +129,31 @@ def build(output=None, *, results_root=None):
 
     for name in candidates:
         run, (summary, points) = registry[name], loaded[name]
-        label = run_label(run)
+        label = run_label(name)
+        reference_label = run_label(REFERENCE)
         plot_name = f"{name}_vs_{REFERENCE}.png"
-        corner_plot({"dynesty_4000 (run_a)": loaded[REFERENCE][1], f"{label} ({name})": points},
+        corner_plot({reference_label: loaded[REFERENCE][1], label: points},
                     assets / plot_name, bounds=bounds)
-        choices.append(f'<a href="#{name}" data-comparison="{name}">{escape(label)}'
-                       f'<span>{name}</span></a>')
+        choices.append(f'<a href="#{name}" data-comparison="{name}">{reference_label} vs {escape(label)}</a>')
         changes = "".join(f"<tr><th scope=\"row\">{code(key)}</th><td>{code(before)}</td><td>{code(after)}</td></tr>"
                           for key, before, after in differences(baseline, run))
         if not changes:
             changes = '<tr><td colspan="3">No supplied settings differ from the reference.</td></tr>'
         panels.append(f'''<article class="comparison" id="{name}" aria-labelledby="title-{name}">
-          <div class="comparison-heading"><div><p class="eyebrow">{name} / run_a</p>
-            <h3 id="title-{name}">{escape(label)} <span>vs</span> dynesty_4000</h3></div>
-            <a class="button" href="assets/{plot_name}" target="_blank" rel="noopener">Open full-size plot ↗</a></div>
-          <div class="legend"><span><i class="line candidate"></i>{escape(label)}</span>
-            <span><i class="line"></i>dynesty_4000 · reference</span><span><i class="line truth"></i>Injection</span></div>
-          <a class="plot" href="assets/{plot_name}" target="_blank" rel="noopener" aria-label="Open {escape(label)} corner plot at full size">
+          <div class="comparison-heading"><h3 id="title-{name}">{reference_label} <span>vs</span> {escape(label)}</h3>
+            <a class="button" href="assets/{plot_name}" target="_blank" rel="noopener">Full-size plot ↗</a></div>
+          <div class="legend"><span><i class="line"></i>{reference_label} · reference</span>
+            <span><i class="line candidate"></i>{escape(label)}</span><span><i class="line truth"></i>Injection</span></div>
+          <a class="plot" href="assets/{plot_name}" target="_blank" rel="noopener" aria-label="Open {reference_label} vs {escape(label)} corner plot at full size">
             <img src="assets/{plot_name}" width="2172" height="2172" loading="lazy"
-              alt="Eight-parameter corner plot: {escape(label)} ({name}) in blue over dynesty_4000 (run_a) in black; injection in grey."></a>
-          <div class="plot-footer"><span>{summary['posterior_rows']:,} candidate / {loaded[REFERENCE][0]['posterior_rows']:,} reference samples</span>
+              alt="Corner plot: {reference_label} in black vs {escape(label)} in blue; injection in grey."></a>
+          <div class="plot-footer"><span>{reference_label}: {loaded[REFERENCE][0]['posterior_rows']:,} samples · {escape(label)}: {summary['posterior_rows']:,}</span>
             <a href="downloads/{name}/posterior.csv" download>Posterior CSV ↓</a>
             <a href="downloads/{name}/summary.json" download>Run summary ↓</a></div>
-          <details class="setting-details"><summary>Exact settings differences <span>{len(differences(baseline, run))} changed</span></summary>
-            <p>Supplied settings only. “Not set” means omitted, rather than a known sampler default. New runs use sampling seed 42.</p>
+          <details class="setting-details"><summary>Settings differences <span>{len(differences(baseline, run))} changed</span></summary>
+            <p>“Not set” means omitted. New runs use sampling seed 42.</p>
             <div class="table-scroll" tabindex="0" role="region" aria-label="Settings differences for {name}">
-              <table class="diff-table"><thead><tr><th scope="col">Setting</th><th scope="col">dynesty_4000</th><th scope="col">{escape(label)}</th></tr></thead><tbody>{changes}</tbody></table>
+              <table class="diff-table"><thead><tr><th scope="col">Setting</th><th scope="col">{reference_label}</th><th scope="col">{escape(label)}</th></tr></thead><tbody>{changes}</tbody></table>
             </div></details>
         </article>''')
 
@@ -155,7 +172,7 @@ def build(output=None, *, results_root=None):
     template = Template((ROOT / "docs" / "template.html").read_text())
     (output / "index.html").write_text(template.substitute(context))
     (output / ".nojekyll").touch()
-    print(f"Built {output}: {len(candidates)} comparisons against dynesty_4000")
+    print(f"Built {output}: {len(candidates)} comparisons against run a")
     return output
 
 

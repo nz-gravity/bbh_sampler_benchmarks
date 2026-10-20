@@ -17,6 +17,8 @@ def result(directory, name):
     save_result(directory / name, posterior, resolve_run(name), {
         "log_evidence": -16170.0, "log_evidence_err": 0.1,
         "log_noise_evidence": data_manifest()["noise_log_likelihood"],
+        **({"likelihood_evaluations": 217823576, "sampling_seconds": 41394.719138, "ncores": 16}
+           if name == "run_a" else {}),
     })
 
 
@@ -70,13 +72,20 @@ def test_site_links_and_plots_share_verified_reference_and_axis_bounds(tmp_path,
     monkeypatch.setattr(docs, "corner_plot", capture_plot)
     output = docs.build(tmp_path / "site", results_root=results)
     assert len(calls) == 2
-    assert all(list(posteriors)[0] == "dynesty_4000 (run_a)" for posteriors, _ in calls)
+    assert [list(posteriors) for posteriors, _ in calls] == [["run a", "run g"], ["run a", "run f"]]
     np.testing.assert_array_equal(next(iter(calls[0][0].values())), next(iter(calls[1][0].values())))
     assert calls[0][1] == calls[1][1]
     page = (output / "index.html").read_text()
     assert "<code>seed</code>" not in page
     assert "New runs use sampling seed 42." in page
-    assert "No result yet" in page
+    assert "Pending" in page
+    assert "dynesty_" not in page
+    assert 'run a <span>vs</span> run g' in page
+    assert '# LnL evals' in page
+    assert '217,823,576' in page
+    assert '11h 29m 55s' in page
+    assert '16 cores' in page
+    assert '<td class="metric">—</td>' in page
     assert 'data-comparison="run_b"' not in page
     assert page.index('data-comparison="run_g"') < page.index('data-comparison="run_f"')
     links = Links()

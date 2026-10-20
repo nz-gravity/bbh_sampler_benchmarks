@@ -95,8 +95,8 @@ Evidence differences require matching data, priors and likelihood conventions. J
 
 ## Public docs website
 
-- Settings table for every registered run, including configurations without results.
-- One corner overlay per available candidate against **dynesty_4000** (`run_a`), with common axis ranges and unit-area marginal densities.
+- Settings, likelihood-call counts and wall times for every registered run, including configurations without results.
+- One corner overlay per available candidate against **run a** (`run_a`), with common axis ranges and unit-area marginal densities.
 - Exact changed settings, full-size plots, and downloadable samples, summaries and configurations.
 - Builds only from saved results; never starts inference. Invalid checksums or mismatched configurations/likelihoods stop the build.
 
@@ -111,4 +111,4 @@ Open <http://127.0.0.1:8000>. The generated `_site/` directory is ignored; commi
 
 To publish on GitHub, select **Settings → Pages → Build and deployment → Source: GitHub Actions**, then push to `main` or run the **Benchmark website** workflow manually. The workflow tests the project, rebuilds plots from the current saved samples, and deploys `_site/`. Pull requests build and test without deploying. Later result commits refresh the website automatically.
 
-Expected URL after the first successful deployment: <https://nz-gravity.github.io/bbh_sampler_benchmarks/>.
+Website: <https://nz-gravity.github.io/bbh_sampler_benchmarks/>.
