@@ -12,7 +12,7 @@ PARAMETERS = ("chirp_mass", "mass_ratio", "a_1", "a_2", "tilt_1", "tilt_2", "phi
 MAX_SAMPLES = 1000
 
 
-def save_result(directory, posterior, config, metrics):
+def save_result(directory, posterior, config, metrics, *, likelihood_id=None):
     """Uniformly select at most 1000 equal-weight posterior rows, without replacement."""
     directory = Path(directory)
     if directory.exists():
@@ -26,7 +26,7 @@ def save_result(directory, posterior, config, metrics):
     path = directory / "posterior.csv"
     posterior.iloc[indices].to_csv(path, index=False, float_format="%.17g")
     summary = {
-        "config": config, "likelihood_id": data_manifest()["likelihood_id"],
+        "config": config, "likelihood_id": likelihood_id or data_manifest()["likelihood_id"],
         "evidence_convention": "full_log_likelihood", **metrics,
         "posterior_rows": len(indices), "original_posterior_rows": len(posterior),
         "posterior_sha256": sha256(path),

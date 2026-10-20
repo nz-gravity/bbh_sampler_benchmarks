@@ -18,8 +18,8 @@ def settings():
     return yaml.safe_load(CONFIG.read_text())
 
 
-def scientific_config():
-    config = settings()
+def scientific_config(config=None):
+    config = settings() if config is None else config
     return {"settings": config, "prior_sha256": sha256(ROOT / config["prior_file"])}
 
 
@@ -63,10 +63,10 @@ def _assemble(config, ifos, waveform):
     return likelihood, priors
 
 
-def data_manifest(data_path=DATA):
+def data_manifest(data_path=DATA, *, config=None):
     data_path = Path(data_path)
     manifest = read_json(data_path.with_suffix(".json"))
-    if manifest["scientific_config"] != scientific_config():
+    if manifest["scientific_config"] != scientific_config(config):
         raise ValueError("BBH configuration/prior changed: saved strain belongs to a different experiment")
     if manifest["data_sha256"] != sha256(data_path):
         raise ValueError("Saved strain checksum mismatch")
@@ -81,12 +81,12 @@ def geometry(ifo):
         "length", "latitude", "longitude", "elevation", "xarm_azimuth", "yarm_azimuth", "xarm_tilt", "yarm_tilt")}
 
 
-def build_likelihood(data_path=DATA):
+def build_likelihood(data_path=DATA, *, config=None):
     """Load immutable strain and PSD arrays; no run can regenerate or reseed noise."""
     import bilby
 
-    config = settings()
-    manifest = data_manifest(data_path)
+    config = settings() if config is None else config
+    manifest = data_manifest(data_path, config=config)
     actual = {name: version(name) for name in CORE_PACKAGES}
     if actual != manifest["core_versions"]:
         raise ValueError("Likelihood dependency versions differ from the saved data manifest; use uv sync --locked")
@@ -107,14 +107,14 @@ def build_likelihood(data_path=DATA):
     return likelihood, priors
 
 
-def generate_data(data_path=DATA):
+def generate_data(data_path=DATA, *, config=None):
     """Explicit, deterministic one-time preparation. Refuse to replace existing data."""
     import bilby
 
     data_path = Path(data_path)
     if data_path.exists() or data_path.with_suffix(".json").exists():
         raise FileExistsError(f"Refusing to replace {data_path}")
-    config = settings()
+    config = settings() if config is None else config
     bilby.core.utils.random.seed(config["noise_seed"])
     np.random.seed(config["noise_seed"])
     ifos, waveform = _interferometers(config), _waveform(config)
@@ -134,7 +134,7 @@ def generate_data(data_path=DATA):
     with data_path.open("xb") as stream:
         np.savez_compressed(stream, **arrays)
     manifest = {
-        "scientific_config": scientific_config(), "data_sha256": sha256(data_path),
+        "scientific_config": scientific_config(config), "data_sha256": sha256(data_path),
         "core_versions": {name: version(name) for name in CORE_PACKAGES},
         "geometry": {ifo.name: geometry(ifo) for ifo in ifos},
         "noise_log_likelihood": likelihood.noise_log_likelihood(),

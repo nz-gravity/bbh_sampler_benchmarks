@@ -2,6 +2,8 @@
 
 Compare initial posterior samplers with **Bilby + Dynesty, 4000 live points** (`run_a`), using one fixed injection, dataset and set of priors.
 
+The separate [100-injection study](studies/catalogue/README.md) applies the cheap `run_m` configuration to the full injection catalogue while reusing this likelihood constructor and run registry.
+
 ## Injection
 
 [configs/bbh.yaml](configs/bbh.yaml) contains the exact injection and likelihood settings. [configs/bbh.prior](configs/bbh.prior) contains the priors.

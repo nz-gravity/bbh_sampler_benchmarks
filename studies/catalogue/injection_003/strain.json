@@ -1,0 +1,84 @@
+{
+  "scientific_config": {
+    "settings": {
+      "detectors": [
+        "H1",
+        "L1"
+      ],
+      "duration": 4.0,
+      "sampling_frequency": 4096,
+      "minimum_frequency": 20.0,
+      "maximum_frequency": 2048.0,
+      "reference_frequency": 20,
+      "waveform_approximant": "IMRPhenomPv2",
+      "start_time": -1.0117621415329827,
+      "noise_seed": 3,
+      "psd": "aLIGO_O4_high_asd.txt",
+      "prior_file": "configs/bbh.prior",
+      "fixed_parameters": [
+        "psi",
+        "ra",
+        "dec",
+        "geocent_time",
+        "phase",
+        "luminosity_distance",
+        "cos_theta_jn"
+      ],
+      "marginalization": {
+        "time": false,
+        "phase": false,
+        "distance": false
+      },
+      "injection": {
+        "chirp_mass": 14.900805759994627,
+        "mass_ratio": 0.2494798662051685,
+        "a_1": 0.1407622019914595,
+        "a_2": 0.8959800793936292,
+        "tilt_1": 2.317521805524788,
+        "tilt_2": 0.9244266164292462,
+        "phi_12": 2.858822416869538,
+        "phi_jl": 6.148619259705623,
+        "luminosity_distance": 843.7800362871891,
+        "dec": -0.111084047121012,
+        "ra": 2.8608832692325397,
+        "cos_theta_jn": -0.7310150813508323,
+        "psi": 2.814340548907862,
+        "phase": 0.3505843125269492,
+        "geocent_time": 0.9882378584670172
+      }
+    },
+    "prior_sha256": "4c8d3dd0b4b7535498529269e15596412a74ade8b346a30ec5d8a61de018c121"
+  },
+  "data_sha256": "c802633d3783a02204847969c4361b64864d9a6f50ae2d11bedd58fe05142824",
+  "core_versions": {
+    "bilby": "2.8.0",
+    "lalsuite": "7.26.15",
+    "numpy": "2.4.4",
+    "scipy": "1.18.1"
+  },
+  "geometry": {
+    "H1": {
+      "length": 4,
+      "latitude": 46.45514666666667,
+      "longitude": -119.4076571388889,
+      "elevation": 142.554,
+      "xarm_azimuth": 125.9994,
+      "yarm_azimuth": 215.9994,
+      "xarm_tilt": -0.0006195,
+      "yarm_tilt": 1.25e-05
+    },
+    "L1": {
+      "length": 4,
+      "latitude": 30.562894333333332,
+      "longitude": -90.77424038888887,
+      "elevation": -6.574,
+      "xarm_azimuth": 197.7165,
+      "yarm_azimuth": 287.7165,
+      "xarm_tilt": -0.0003121,
+      "yarm_tilt": -0.0006107
+    }
+  },
+  "noise_log_likelihood": -16220.937171209296,
+  "evidence_convention": "Bilby full log likelihood (noise constant included); use_ratio=True during sampling",
+  "likelihood_id": "9289bf5fe4d9c516e4eb4e9a0cdb6940ff8b7f4b24e8d4542a8c42df234548d3"
+}
