@@ -61,6 +61,8 @@ def execute_run(run_id, *, resume=False, npool=1, results_root=None, registry=No
     lock = work / ".running.lock"
     with lock.open("x") as stream:
         stream.write(f"pid={os.getpid()}\n")
+        if job_id := os.environ.get("SLURM_JOB_ID"):
+            stream.write(f"job={job_id}\n")
     try:
         if not snapshot.exists():
             write_json(snapshot, config)

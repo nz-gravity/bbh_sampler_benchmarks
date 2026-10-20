@@ -18,3 +18,4 @@ plots/*
 *.hdf5
 *.log
 slurm-*.out
+slurm-*.err

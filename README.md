@@ -45,6 +45,26 @@ uv run python -m benchmark.run --run run_b
 
 Use `--npool 4` for four workers, or `sbatch run.slurm run_b` on a cluster. Resume an interrupted run with `--run run_b --resume`. Checkpoints stay in ignored `.work/` directories until completion, then are removed. After a hard kill, remove `.running.lock` only after confirming the job has stopped.
 
+## OzSTAR jobs
+
+Run these commands manually from the repository checkout on the login node, with `uv` available:
+
+```bash
+bash ozstar/setup_env.sh         # Install the locked environment and check the saved dataset
+bash ozstar/submit.sh            # Preview the new Dynesty jobs: run_b, run_c, run_d, run_e
+bash ozstar/submit.sh --submit   # Submit those jobs
+```
+
+One generic `run.slurm` serves every configuration. Defaults are account `oz200`, one node, 4 CPUs, 8 GiB RAM and 24 hours per job. Override resources with `SLURM_ACCOUNT`, `BBH_CPUS`, `BBH_MEM`, or `BBH_TIME`. The script leaves partition selection to OzSTAR, following its [job-queue guidance](https://supercomputing.swin.edu.au/docs/2-ozstar/oz-partition.html).
+
+```bash
+bash ozstar/submit.sh --submit run_c                         # Select one run
+bash ozstar/submit.sh --submit --resume run_c                # Resume its checkpoint
+BBH_TIME=48:00:00 bash ozstar/submit.sh --submit run_j         # Optional fresh MCMC repeat
+```
+
+The existing MCMC result (`run_f`) is reused; `run_j` is excluded from default submissions. Completed runs are skipped. Batch jobs use the prepared environment without installing packages and load the committed strain/PSD arrays. They request a checkpoint three minutes before the time limit and clear only their own stopped-process lock. An interrupted job is resumed manually with the same CPU allocation. Logs are `slurm-<job-name>-<job-id>.out` and `.err` in the checkout. Only the compact posterior and runtime/evidence summary remain under `results/` on success.
+
 ## Small results for Git
 
 Each completed run keeps only:

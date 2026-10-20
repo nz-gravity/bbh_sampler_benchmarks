@@ -56,7 +56,10 @@ def test_every_planned_sampler_receives_identical_likelihood(tmp_path, monkeypat
 
 
 def test_resume_requires_identical_snapshot_and_existing_checkpoint(tmp_path, monkeypatch):
+    monkeypatch.setenv("SLURM_JOB_ID", "12345")
     def interrupted(**kwargs):
+        lock = Path(kwargs["outdir"]) / ".running.lock"
+        assert lock.read_text().splitlines()[1] == "job=12345"
         (Path(kwargs["outdir"]) / "run_b_resume.pickle").write_text("test checkpoint; never deserialized")
         raise KeyboardInterrupt
     monkeypatch.setattr(bilby, "run_sampler", interrupted)
@@ -75,6 +78,7 @@ def test_resume_requires_identical_snapshot_and_existing_checkpoint(tmp_path, mo
         assert kwargs["resume"] is True
         return fake_result()
     monkeypatch.setattr(bilby, "run_sampler", resumed)
+    monkeypatch.setenv("SLURM_JOB_ID", "67890")
     execute_run("run_b", results_root=tmp_path / "results", resume=True)
 
 
