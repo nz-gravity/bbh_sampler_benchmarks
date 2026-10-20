@@ -11,7 +11,7 @@ Compare initial posterior samplers with **Bilby + Dynesty, 4000 live points** (`
 - Eight intrinsic parameters sampled; extrinsics fixed. No phase, time or distance marginalization.
 - Every run loads the identical strain and PSD arrays from [data/bbh_strain.npz](data/bbh_strain.npz). The data settings, checksum and dependency versions are in [data/bbh_strain.json](data/bbh_strain.json).
 
-The dataset and prior file are committed. `uv.lock` pins the environment. Tests regenerate the dataset from the fixed noise seed and require **byte-identical data** and matching priors. Sampler seeds never change the data.
+The dataset and prior file are committed. `uv.lock` pins the environment. Tests require **byte-identical repeated generation on the same platform**, matching priors, and agreement with the archived arrays within 64 machine epsilons of each array's largest finite magnitude across platforms. Every benchmark uses the archived dataset, verified by its exact checksum. Sampler seeds never change the data. The optional `--check` command additionally requires byte identity with the archive, so it can fail on a different OS or CPU because of compiled-waveform roundoff.
 
 ## Configurations
 

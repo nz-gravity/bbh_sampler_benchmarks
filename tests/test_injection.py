@@ -29,13 +29,26 @@ def test_saved_data_and_prior_contract(shared_likelihood):
 def test_deterministic_generation_and_no_overwrite(tmp_path, shared_likelihood):
     path = tmp_path / "bbh_strain.npz"
     generate_data(path)
+    repeated = tmp_path / "repeated.npz"
+    generate_data(repeated)
+    # Fixed seeds must reproduce identical bytes on this platform. Compiled
+    # waveform libraries can round differently across operating systems/CPUs.
+    assert sha256(path) == sha256(repeated)
     with np.load(DATA) as expected, np.load(path) as actual:
+        assert actual.files == expected.files
         for key in expected.files:
-            np.testing.assert_array_equal(actual[key], expected[key])
-    assert sha256(path) == sha256(DATA)
+            finite = np.isfinite(expected[key])
+            # PSDs use infinity outside their supported band; check those entries
+            # exactly and exclude them from the roundoff scale.
+            np.testing.assert_array_equal(actual[key][~finite], expected[key][~finite])
+            # Bound absolute roundoff relative to each array's physical scale;
+            # numpy's default absolute tolerance would dwarf strain/PSD values.
+            tolerance = 64 * np.finfo(float).eps * np.max(np.abs(expected[key][finite]), initial=0)
+            np.testing.assert_allclose(actual[key][finite], expected[key][finite], rtol=0, atol=tolerance)
     reloaded, priors = build_likelihood(path)
     parameters = settings()["injection"]
-    assert reloaded.log_likelihood(parameters=parameters) == shared_likelihood[0].log_likelihood(parameters=parameters)
+    assert reloaded.log_likelihood(parameters=parameters) == pytest.approx(
+        shared_likelihood[0].log_likelihood(parameters=parameters), rel=0, abs=1e-9)
     with pytest.raises(FileExistsError):
         generate_data(path)
     path.write_bytes(path.read_bytes() + b"changed")
